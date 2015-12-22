@@ -229,7 +229,7 @@ confusionMatrix(predict,validation$classe)</code></pre>
 </div>
 <div id="training-data" class="section level2">
 <h2>Training Data</h2>
-<p>Now do the predictions on test data. We preprocessed the test data by eliminating the features not used at the same time we pre-processed the training data.</p>
+<p>Now do the predictions on test data. I preprocessed the test data by eliminating the features not being used at the same time I pre-processed the training data.</p>
 <pre class="r"><code>predict &lt;- predict(modFit,testing[,-ncol(testing)])
 predict</code></pre>
 <pre><code>##  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 

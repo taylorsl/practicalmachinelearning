@@ -110,7 +110,7 @@ confusionMatrix(predict,validation$classe)
 ```
 
 ## Training Data
-Now do the predictions on test data. We preprocessed the test data by eliminating the features not used at the same time we pre-processed the training data.
+Now do the predictions on test data. I preprocessed the test data by eliminating the features not being used at the same time I pre-processed the training data.
 
 ```{r message=FALSE, warning=FALSE, cache=FALSE}
 predict <- predict(modFit,testing[,-ncol(testing)])
