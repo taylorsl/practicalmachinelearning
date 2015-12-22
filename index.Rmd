@@ -22,7 +22,10 @@ The test data are available here: [https://d396qusza40orc.cloudfront.net/predmac
 
 The data for this project come from this source: [http://groupware.les.inf.puc-rio.br/har](http://groupware.les.inf.puc-rio.br/har)  
 
-I used the Random Forest model for training and achieved 99.82% accuracy on the validation set. The training set was 60% of the original training data, with 40% used for the cross-validation. I determined the set of features by eliminating those that were time stamps and obviously low variance immediately, checking for other near zero variance features and then eliminating variables with high cross-correlation. This brought us to 32 features used in the training set. 
+I used the Random Forest model for training and achieved 99.75% accuracy or 0.25% error rate on the validation set. This is close to the Out-of-Bag (OOB) estimate of the error rate of 0.3% predicted by the algorithm (which would correspond to 99.7% accuracy). 
+
+The training set used was 60% of the original training data, with 40% used for the cross-validation. I determined the set of features by eliminating those that were time stamps and obviously low variance immediately, checking for other near zero variance features (of which there were no additional) and then eliminating variables with high cross-correlation. This brought me to 32 features (out of the original 159) used in the training set. 
+
 
 ##Code
 ###Data Cleanup
@@ -126,11 +129,3 @@ pml_write_files(answers)
 ```
 
 
-
-You can also embed plots, for example:
-
-```{r, echo=FALSE}
-plot(cars)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
