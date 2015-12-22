@@ -5,14 +5,127 @@ date: "December 15, 2015"
 output: html_document
 ---
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r}
-trainingData <- read.csv(file = "pml-training.csv")
-testingData <- read.csv(file = "pml-testing.csv")
+```{r message=FALSE, warning=FALSE}
+library(dplyr)
+library(caret)
+library(rattle)
+library(randomForest)
 ```
+
+###Summary
+In this project, the goal is to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. The participants were asked to perform barbell lifts correctly and incorrectly in 5 different ways. The goal is to predict the manner in which they did the exercise. These are the 5 classifications: A - E. The goal is to predict the manner in which they did the exercise.
+
+The training data for this project are available here: 
+[https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv](https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv)
+
+The test data are available here: [https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv] (https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv)
+
+The data for this project come from this source: [http://groupware.les.inf.puc-rio.br/har](http://groupware.les.inf.puc-rio.br/har)  
+
+I used the Random Forest model for training and achieved 99.82% accuracy on the validation set. The training set was 60% of the original training data, with 40% used for the cross-validation. I determined the set of features by eliminating those that were time stamps and obviously low variance immediately, checking for other near zero variance features and then eliminating variables with high cross-correlation. This brought us to 32 features used in the training set. 
+
+##Code
+###Data Cleanup
+The data has some columns with all NAs and some other bad or missing variables. We will change these to NA and then remove the columns that have a lot of "NA" for data to reduce the number of features. 
+
+```{r message=FALSE, warning=FALSE, cache=TRUE}
+trainingData <- read.csv(file = "pml-training.csv", na.strings=c("NA","#DIV/0!", ""))
+testingData <- read.csv(file = "pml-testing.csv", na.strings=c("NA","#DIV/0!", ""))
+
+#remove columns with timestamp data
+ncol <- ncol(testingData)
+trainingData <- trainingData[,7:ncol]
+testingData <- testingData[,7:ncol]
+```
+
+Preprocess to remove columns with NAs
+```{r message=FALSE, warning=FALSE, cache=TRUE}
+#need to remove columns with more than 25% NAs
+threshold <- ncol(trainingData)*.25
+training2 <- trainingData[,colSums(is.na(trainingData)) < threshold]
+testing   <- testingData[,colSums(is.na(trainingData)) < threshold]
+print(paste("Removing columns with NAs, reduced the number of columns from: ",ncol(trainingData),
+            "to: ",ncol(training2)))
+```
+
+### Feature Reduction
+Check if there are anymore variables that have near zero variance. The program found that this did not eliminate any more features.
+```{r message=FALSE, warning=FALSE}
+#check for columns with zero variance
+#need to preprocess training data in same way
+nzv <- nearZeroVar(training2, saveMetrics=TRUE)
+training2 <- training2[,nzv$nzv==FALSE]
+testing <- testing[,nzv$nzv==FALSE]
+print(paste("Checking for near Zero variance reduced the number of columns to: ", ncol(training2)))
+```
+
+Check for any highly correlated features to remove these. This reduced the features from 52 to 31. In a previous comparison, found that the cross validation accuracy was very slightly better with reduced set, so used that for final model.
+```{r message=FALSE, warning=FALSE}
+#Check for highly correlated features
+correlationMatrix <- cor(training2[,1:ncol(training2)-1])
+highlyCorrelated <- findCorrelation(correlationMatrix,cutoff=0.75)
+highlyCorrelated <- sort (highlyCorrelated)
+training2 <- training2[,-c(highlyCorrelated)]
+testing <- testing[,-c(highlyCorrelated)]
+print(paste("Eliminated highly correlated features reduced the number of columns to: ", ncol(training2)))
+```
+
+##Create Model
+Partition the processing training data, so that we can test the effectiveness of the algorithm. Using 60% of the data since have issues running program with too much training data.
+
+```{r message=FALSE, warning=FALSE}
+inTrain <- createDataPartition(y=training2$classe,p=0.6,list=FALSE) 
+training <- training2[inTrain,]
+validation <- training2[-inTrain,]
+```
+
+Train the data on the RandomForest Model
+```{r message=FALSE, warning=FALSE, cache=TRUE}
+set.seed(647)
+ncol <- ncol(training)
+modFit <- randomForest (x <- training[,-ncol], y <- training$classe, prox=TRUE)
+modFit
+```
+
+Look at most important features
+```{r message=FALSE, warning=FALSE, cache=FALSE}
+importance <- varImp(modFit, scale=FALSE)
+importance$features <- rownames(importance)
+row.names(importance) <- NULL
+importance <- arrange(importance,desc(Overall))
+importance
+```
+
+## Cross Validation 
+
+Estimate error from validation set
+```{r message=FALSE, warning=FALSE, cache=FALSE}
+#Estimate out of sample error with validation set
+predict <- predict(modFit,validation)
+confusionMatrix(predict,validation$classe)
+```
+
+## Training Data
+Now do the predictions on test data. We preprocessed the test data by eliminating the features not used at the same time we pre-processed the training data.
+
+```{r message=FALSE, warning=FALSE, cache=FALSE}
+predict <- predict(modFit,testing[,-ncol(testing)])
+predict
+
+#Write files
+answers <- as.character(predict)
+pml_write_files = function(x){
+  n = length(x)
+  for(i in 1:n){
+    filename = paste0("problem_id_",i,".txt")
+    write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
+  }
+}
+
+pml_write_files(answers)
+```
+
+
 
 You can also embed plots, for example:
 
