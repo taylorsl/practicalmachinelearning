@@ -68,10 +68,6 @@ img {
 </div>
 
 
-<pre class="r"><code>library(dplyr)
-library(caret)
-library(rattle)
-library(randomForest)</code></pre>
 <div id="summary" class="section level3">
 <h3>Summary</h3>
 <p>In this project, the goal is to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. The participants were asked to perform barbell lifts correctly and incorrectly in 5 different ways. The goal is to predict the manner in which they did the exercise. These are the 5 classifications: A - E. The goal is to predict the manner in which they did the exercise.</p>
@@ -83,6 +79,10 @@ library(randomForest)</code></pre>
 </div>
 <div id="code" class="section level2">
 <h2>Code</h2>
+<pre class="r"><code>library(dplyr)
+library(caret)
+library(rattle)
+library(randomForest)</code></pre>
 <div id="data-cleanup" class="section level3">
 <h3>Data Cleanup</h3>
 <p>The data has some columns with all NAs and some other bad or missing variables. We will change these to NA and then remove the columns that have a lot of “NA” for data to reduce the number of features.</p>

@@ -5,12 +5,6 @@ date: "December 15, 2015"
 output: html_document
 ---
 
-```{r message=FALSE, warning=FALSE}
-library(dplyr)
-library(caret)
-library(rattle)
-library(randomForest)
-```
 
 ###Summary
 In this project, the goal is to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. The participants were asked to perform barbell lifts correctly and incorrectly in 5 different ways. The goal is to predict the manner in which they did the exercise. These are the 5 classifications: A - E. The goal is to predict the manner in which they did the exercise.
@@ -28,6 +22,13 @@ The training set used was 60% of the original training data, with 40% used for t
 
 
 ##Code
+
+```{r message=FALSE, warning=FALSE}
+library(dplyr)
+library(caret)
+library(rattle)
+library(randomForest)
+```
 ###Data Cleanup
 The data has some columns with all NAs and some other bad or missing variables. We will change these to NA and then remove the columns that have a lot of "NA" for data to reduce the number of features. 
 
