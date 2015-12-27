@@ -16,6 +16,7 @@ The test data are available here: [https://d396qusza40orc.cloudfront.net/predmac
 
 The data for this project come from this source: [http://groupware.les.inf.puc-rio.br/har](http://groupware.les.inf.puc-rio.br/har)  
 
+## Results
 I used the Random Forest model for training and achieved 99.75% accuracy or 0.25% error rate on the validation set. This is close to the Out-of-Bag (OOB) estimate of the error rate of 0.3% predicted by the algorithm (which would correspond to 99.7% accuracy). 
 
 The training set used was 60% of the original training data, with 40% used for the cross-validation. I determined the set of features by eliminating those that were time stamps and obviously low variance immediately, checking for other near zero variance features (of which there were no additional) and then eliminating variables with high cross-correlation. This brought me to 32 features (out of the original 159) used in the training set. 
@@ -74,7 +75,7 @@ testing <- testing[,-c(highlyCorrelated)]
 print(paste("Eliminated highly correlated features reduced the number of columns to: ", ncol(training2)))
 ```
 
-##Create Model
+###Create Model
 Partition the processing training data, so that we can test the effectiveness of the algorithm. Using 60% of the data since have issues running program with too much training data.
 
 ```{r message=FALSE, warning=FALSE}
@@ -100,7 +101,7 @@ importance <- arrange(importance,desc(Overall))
 importance
 ```
 
-## Cross Validation 
+### Cross Validation 
 
 Estimate error from validation set
 ```{r message=FALSE, warning=FALSE, cache=FALSE}
@@ -109,7 +110,7 @@ predict <- predict(modFit,validation)
 confusionMatrix(predict,validation$classe)
 ```
 
-## Training Data
+### Test Data
 Now do the predictions on test data. I preprocessed the test data by eliminating the features not being used at the same time I pre-processed the training data.
 
 ```{r message=FALSE, warning=FALSE, cache=FALSE}

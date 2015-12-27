@@ -74,6 +74,9 @@ img {
 <p>The training data for this project are available here: <a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"><a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv" class="uri">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv</a></a></p>
 <p>The test data are available here: [<a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv" class="uri">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv</a>] (<a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv" class="uri">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv</a>)</p>
 <p>The data for this project come from this source: <a href="http://groupware.les.inf.puc-rio.br/har"><a href="http://groupware.les.inf.puc-rio.br/har" class="uri">http://groupware.les.inf.puc-rio.br/har</a></a></p>
+</div>
+<div id="results" class="section level2">
+<h2>Results</h2>
 <p>I used the Random Forest model for training and achieved 99.75% accuracy or 0.25% error rate on the validation set. This is close to the Out-of-Bag (OOB) estimate of the error rate of 0.3% predicted by the algorithm (which would correspond to 99.7% accuracy).</p>
 <p>The training set used was 60% of the original training data, with 40% used for the cross-validation. I determined the set of features by eliminating those that were time stamps and obviously low variance immediately, checking for other near zero variance features (of which there were no additional) and then eliminating variables with high cross-correlation. This brought me to 32 features (out of the original 159) used in the training set.</p>
 </div>
@@ -122,9 +125,8 @@ testing &lt;- testing[,-c(highlyCorrelated)]
 print(paste(&quot;Eliminated highly correlated features reduced the number of columns to: &quot;, ncol(training2)))</code></pre>
 <pre><code>## [1] &quot;Eliminated highly correlated features reduced the number of columns to:  33&quot;</code></pre>
 </div>
-</div>
-<div id="create-model" class="section level2">
-<h2>Create Model</h2>
+<div id="create-model" class="section level3">
+<h3>Create Model</h3>
 <p>Partition the processing training data, so that we can test the effectiveness of the algorithm. Using 60% of the data since have issues running program with too much training data.</p>
 <pre class="r"><code>inTrain &lt;- createDataPartition(y=training2$classe,p=0.6,list=FALSE) 
 training &lt;- training2[inTrain,]
@@ -189,8 +191,8 @@ importance</code></pre>
 ## 31   84.67198      gyros_forearm_x
 ## 32   67.43304          gyros_arm_z</code></pre>
 </div>
-<div id="cross-validation" class="section level2">
-<h2>Cross Validation</h2>
+<div id="cross-validation" class="section level3">
+<h3>Cross Validation</h3>
 <p>Estimate error from validation set</p>
 <pre class="r"><code>#Estimate out of sample error with validation set
 predict &lt;- predict(modFit,validation)
@@ -227,8 +229,8 @@ confusionMatrix(predict,validation$classe)</code></pre>
 ## Detection Prevalence   0.2845   0.1937   0.1744   0.1638   0.1837
 ## Balanced Accuracy      0.9997   0.9986   0.9965   0.9973   0.9992</code></pre>
 </div>
-<div id="training-data" class="section level2">
-<h2>Training Data</h2>
+<div id="test-data" class="section level3">
+<h3>Test Data</h3>
 <p>Now do the predictions on test data. I preprocessed the test data by eliminating the features not being used at the same time I pre-processed the training data.</p>
 <pre class="r"><code>predict &lt;- predict(modFit,testing[,-ncol(testing)])
 predict</code></pre>
@@ -246,6 +248,7 @@ pml_write_files = function(x){
 }
 
 pml_write_files(answers)</code></pre>
+</div>
 </div>
 
 
